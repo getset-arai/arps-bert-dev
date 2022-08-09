@@ -1,10 +1,10 @@
 import logging
-from models.bert_finetuning import BertFinetuning
-from utils.analyze_livedoor import AnalyzeLivedoor
+from lib.bert_finetuning import BertFinetuning
+from analyze_livedoor import AnalyzeLivedoor
 
 logging.basicConfig(level=logging.INFO)
 
-DIR_NAME = "./static/datasets/kaden-channel"
+DIR_NAME = "../../datasets/kaden-channel"
 analyze_livedoor = AnalyzeLivedoor(DIR_NAME)
 
 PRETRAINED_MODEL_PATH = "./static/model"

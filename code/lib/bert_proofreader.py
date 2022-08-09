@@ -21,7 +21,7 @@ class BertProofreader:
         if weights_path is not None:
             self.model.load_weights(weights_path)
 
-        self.model.to("cpu")  # or "cuda"
+        self.model.to('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.eval()
 
     def mask_prediction(self, sentence: str) -> torch.Tensor:
@@ -55,26 +55,32 @@ class BertProofreader:
         """
 
         tokens, predictions = self.mask_prediction(sentence)
+        # decord_tokens = self.tokenizer.decode(self.tokenizer.convert_tokens_to_ids(tokens))
+        # logger.info(decord_tokens)
 
         pred_sort = torch.argsort(predictions, dim=2, descending=True)
         pred_top_k = pred_sort[:, :, :topk]  # 上位Xのindex取得
 
-        judges = []
-        highlight = ''
+        highlight_sentence = ""
+        summary = []
         for i in range(len(tokens) - 2):
             pred_top_k_word = self.tokenizer.convert_ids_to_tokens(pred_top_k[i][i + 1])
             result = tokens[i + 1] in pred_top_k_word
             rank = -1
             if not result:
-                highlight += f'<<{tokens[i + 1]}>>'
+                highlight_sentence += f'*{tokens[i + 1]}*'
+                summary.append({
+                    "word": tokens[i + 1],
+                    "candidate": pred_top_k_word[0:5]
+                })
             else:
-                highlight += f'{tokens[i + 1]}'
+                highlight_sentence += f'{tokens[i + 1]}'
                 rank = pred_top_k_word.index(tokens[i + 1])
-            judges.append(result)
-            logger.info(f'{tokens[i + 1]}: {judges[-1]}, top 5 k word={pred_top_k_word[0:5]}, the word rank={rank}')
 
-        logger.info(highlight)
-        return all(judges)
+            logger.info(f'{tokens[i + 1]}: {result}, top 5 k word={pred_top_k_word[0:5]}, the word rank={rank}')
+        summary.insert(0, {"sentence": highlight_sentence})
+        logger.info(highlight_sentence)
+        return summary
 
     def check_threshold(self, sentence: str, threshold: float = 0.01):
         """

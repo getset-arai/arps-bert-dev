@@ -1,5 +1,5 @@
 import logging
-from models.bert_proofreader import BertProofreader
+from lib.bert_proofreader import BertProofreader
 
 logging.basicConfig(level=logging.INFO)
 

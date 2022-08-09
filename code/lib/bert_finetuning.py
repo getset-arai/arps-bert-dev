@@ -8,9 +8,6 @@ from transformers import DataCollatorForLanguageModeling, AutoTokenizer, AutoMod
 from transformers.data import default_data_collator
 import tensorflow as tf
 
-from utils.analyze_livedoor import AnalyzeLivedoor
-
-
 logger = logging.getLogger(__name__)
 
 
