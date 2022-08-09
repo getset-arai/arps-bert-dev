@@ -1,1 +1,3 @@
-pip install transformers fugashi ipadic
+transformers
+fugashi
+ipadic
